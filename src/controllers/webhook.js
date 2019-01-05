@@ -1,10 +1,19 @@
-import { Client } from '@line/bot-sdk'
+import {
+  Client
+} from '@line/bot-sdk'
 import Bot from '../bot'
 import card from '../card'
+import Sensor from './sensor'
 
-const { channelAccessToken, channelSecret } = process.env
+const {
+  channelAccessToken,
+  channelSecret
+} = process.env
 
-const client = new Client({ channelAccessToken, channelSecret });
+const client = new Client({
+  channelAccessToken,
+  channelSecret
+});
 const bot = new Bot()
 
 const webhook = (req, res) => {
@@ -43,8 +52,7 @@ const checkMessageType = (req) => {
         // })
       });
     }
-  }
-  else if (type === 'beacon') {
+  } else if (type === 'beacon') {
     //push data to user
     console.log('recive beacon')
     replyTo(replyToken, {
@@ -52,16 +60,14 @@ const checkMessageType = (req) => {
       altText: "This is a Flex Message",
       contents: card
     })
-  }
-  else if (type === 'follow') {
+  } else if (type === 'follow') {
     //add user id to DB
     console.log('someone follow us')
     replyTo(replyToken, {
       type: 'text',
       text: 'ขิง ข่า ตะใคร้ ใบมะกรูด'
     })
-  }
-  else if (type === 'unfollow') {
+  } else if (type === 'unfollow') {
     //remove user id in DB
     console.log('someone unfollow us')
   }
@@ -78,11 +84,12 @@ const checkIntent = (queryResult, line) => {
   if (intentName === 'ask info - custom') {
     var sensor = queryResult.parameters.fields.sensor.stringValue
     //request data from DB
-
-    //reply
-    replyTo(replyToken, {
-      type: 'text',
-      text: '' + sensor + ' : ' + 12345678
+    Sensor._getEntry(sensor, 1, (err, doc) => {
+      //reply
+      replyTo(replyToken, {
+        type: 'text',
+        text: '' + sensor + ' : ' + doc[0][sensor]
+      })
     })
   }
   // handle normal intent
