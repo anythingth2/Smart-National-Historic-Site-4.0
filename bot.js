@@ -27,7 +27,6 @@ class Bot {
                 } else {
                     console.log(` No intent matched`);
                 }
-                console.log(`result: ${JSON.stringify(result)}`)
                 console.log();
                 resolve(result);
             }).catch(err => {

@@ -1,9 +1,9 @@
 var express = require('express')
 var bodyParser = require('body-parser')
 var app = express();
-var webhook = require('./WebhookController')
+var webhook = require('./WebhookController').webhook
 const middleware = require('@line/bot-sdk').middleware
-const lineConfig = require('./line_config.js').config
+const lineConfig = require('./line_config')
 // const Bot = require('./bot');
 // const test = async () => {
 //     var bot = new Bot();
