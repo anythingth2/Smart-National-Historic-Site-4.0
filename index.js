@@ -1,11 +1,13 @@
-const Bot = require('./bot');
-const test = async () => {
+
 var express = require('express')
 var bodyParser = require('body-parser')
-var app = express()
+var app = express();
 var webhook = require('./WebhookController')
 const middleware = require('@line/bot-sdk').middleware
-const config = require('./line_config.js').config
+const lineConfig = require('./line_config.js').config
+const Bot = require('./bot');
+const test = async () => {
+
 
     var bot = new Bot();
     await bot.pushMessage('สวัสดี');
@@ -23,7 +25,7 @@ console.log("Start Sever .....")
 
 
 
-app.post('/webhook', middleware(config), (req, res) => {
+app.post('/webhook', middleware(lineConfig), (req, res) => {
     webhook(req, res)
 })
 
