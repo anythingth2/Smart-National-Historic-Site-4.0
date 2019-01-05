@@ -73,7 +73,7 @@ const addEntry = (req, res) => {
 
 const getEntry = (req, res) => {
   let { limit, select } = req.query
-  let findQuery = Sensor.find({}).sort({ createAt: 1 })
+  let findQuery = Sensor.find({}).sort({ createdAt: -1 })
   if (limit && !isNaN(limit = parseInt(limit))) {
     findQuery = findQuery.limit(limit)
   }
