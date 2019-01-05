@@ -17,7 +17,7 @@ class Bot {
                     },
                 }
             }).then(responses => {
-                
+
                 console.log('detect intent');
                 const result = responses[0].queryResult;
                 console.log(`Query: ${result.queryText}`);
@@ -28,7 +28,7 @@ class Bot {
                     console.log(` No intent matched`);
                 }
                 console.log();
-                resolve();
+                resolve(result.fulfillmentText);
             }).catch(err => {
                 console.error('Error: ', err);
                 reject();
