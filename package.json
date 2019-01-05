@@ -1,0 +1,26 @@
+{
+  "name": "topgun2019pretrainintelligencesystem",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anythingth2/Topgun2019PretrainIntelligenceSystem.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anythingth2/Topgun2019PretrainIntelligenceSystem/issues"
+  },
+  "homepage": "https://github.com/anythingth2/Topgun2019PretrainIntelligenceSystem#readme",
+  "dependencies": {
+    "express": "^4.16.4",
+    "@line/bot-sdk": "^6.4.0",
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
+    "dialogflow": "^0.7.0"
+  }
+}
