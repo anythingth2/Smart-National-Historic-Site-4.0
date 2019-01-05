@@ -81,7 +81,7 @@ const _getEntry = (select, limit, callback) => {
 
 const getEntry = (req, res) => {
   let { limit, select } = req.query
-  _getEntry(limit, select, (err, doc) => {
+  _getEntry(select, limit, (err, doc) => {
     if (err) {
       console.error(err)
       res.status(500).json({
