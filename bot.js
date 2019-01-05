@@ -2,11 +2,10 @@ const dialogflow = require('dialogflow');
 const config = require('./config');
 class Bot {
     constructor() {
-
     }
-    pushMessage(msg) {
+    pushMessage(lineId, msg) {
         var sessionClient = new dialogflow.SessionsClient();
-        var sessionPath = sessionClient.sessionPath(config.projectId, 'test');
+        var sessionPath = sessionClient.sessionPath(config.projectId, lineId);
         return new Promise((resolve, reject) => {
             sessionClient.detectIntent({
                 session: sessionPath,
@@ -22,13 +21,15 @@ class Bot {
                 const result = responses[0].queryResult;
                 console.log(`Query: ${result.queryText}`);
                 console.log(`Response: ${result.fulfillmentText}`);
+                console.log(`FulFillment_Messages: ${JSON.stringify(result.fulfillmentMessages)}`);
                 if (result.intent) {
                     console.log(`Intent: ${result.intent.displayName}`);
                 } else {
                     console.log(` No intent matched`);
                 }
+                console.log(`result: ${JSON.stringify(result)}`)
                 console.log();
-                resolve(result.fulfillmentText);
+                resolve(result);
             }).catch(err => {
                 console.error('Error: ', err);
                 reject();

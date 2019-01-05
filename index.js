@@ -23,7 +23,7 @@ console.log("Start Sever .....")
 
 
 app.post('/webhook', middleware(lineConfig), (req, res) => {
-    webhook(req, res)
+    webhook(req, res);
 })
 
 app.listen(8080)

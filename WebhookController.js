@@ -21,15 +21,18 @@ function webhook(req, res) {
 
             // client.pushMessage(userId,{
             //     type: 'text',
-            //     text: 'You user id is : '+userId,
+            //     text: 'You user id is : '+userId
             // })
-            bot.pushMessage(message.text).then(resMessage => {
+            bot.pushMessage(userId, message.text).then(queryResult => {
                 client.replyMessage(replyToken, {
                     type: 'text',
-                    text: resMessage,
+                    text: queryResult.fulfillmentText,
                 })
             });
+        } else {
+            res.json({});
         }
+
     } else {
         res.json()
     }
