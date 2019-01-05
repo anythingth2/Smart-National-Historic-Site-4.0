@@ -71,13 +71,17 @@ const addEntry = (req, res) => {
   })
 }
 
-const getEntry = (req, res) => {
-  let { limit, select } = req.query
+const _getEntry = (select, limit, callback) => {
   let findQuery = Sensor.find({}).sort({ createdAt: -1 })
   if (limit && !isNaN(limit = parseInt(limit))) {
     findQuery = findQuery.limit(limit)
   }
-  findQuery.select((select || '-_id -updateAt -__v')).exec((err, doc) => {
+  findQuery.select((select || '-_id -updateAt -__v')).exec(callback)
+}
+
+const getEntry = (req, res) => {
+  let { limit, select } = req.query
+  _getEntry(limit, select, (err, doc) => {
     if (err) {
       console.error(err)
       res.status(500).json({
@@ -95,5 +99,6 @@ const getEntry = (req, res) => {
 export default {
   addEntry,
   getEntry,
-  _addEntry
+  _addEntry,
+  _getEntry
 }
