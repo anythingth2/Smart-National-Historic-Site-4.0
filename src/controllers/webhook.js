@@ -4,6 +4,7 @@ import {
 import Bot from '../bot'
 import card from '../card'
 import Sensor from './sensor'
+import webhookMessageHandler from './webhookMessageHandler'
 
 const {
   channelAccessToken,
@@ -16,10 +17,65 @@ const client = new Client({
 });
 const bot = new Bot()
 
+const handleBeacon = (req) => {
+  //push data to user
+  console.log('recive beacon')
+  replyTo(replyToken, {
+    type: 'flex',
+    altText: "This is a Flex Message",
+    contents: card
+  })
+}
+
+const handleFollow = (req) => {
+  //add user id to DB
+  console.log('someone follow us')
+  replyTo(replyToken, {
+    type: 'text',
+    text: 'ขิง ข่า ตะใคร้ ใบมะกรูด'
+  })
+}
+
+const handleUnfollow = (req) => {
+  //remove user id in DB
+  console.log('someone unfollow us')
+}
+
 const webhook = (req, res) => {
-  console.log(req.body.events[0])
-  checkMessageType(req)
+  checkEventType(req)
   res.status(200).end()
+}
+
+const handleMessage = (req) => {
+  const event = req.body.events[0]
+  const { replyToken, message } = event
+  const userId = event.source.userId
+  const messageType = message.type
+
+  if (messageType === 'text') {
+    bot.pushMessage(userId, message.text).then(queryResult => {
+      const intentName = getIntent(queryResult)
+      webhookMessageHandler(intentName, queryResult, replyToken)
+    });
+  } else {
+    console.error('MessageType Not implemented ' + messageType)
+  }
+}
+
+const eventMapping = {
+  message: handleMessage,
+  beacon: handleBeacon,
+  follow: handleFollow,
+  unfollow: handleUnfollow
+}
+
+const checkEventType = (req) => {
+  const type = req.body.events[0].type
+  if (eventMapping[type]) {
+    eventMapping[type](req)
+  } else {
+    console.error("EventType Not implemented " + type)
+  }
 }
 
 export const replyTo = (replyToken, messageObj) => {
@@ -30,76 +86,6 @@ export const sendTo = (userId, messageObj) => {
   client.pushMessage(userId, messageObj)
 }
 
-const checkMessageType = (req) => {
-  const type = req.body.events[0].type
-  const replyToken = req.body.events[0].replyToken
-  //handle message 
-  if (type === 'message') {
-    const userId = req.body.events[0].source.userId
-    const message = req.body.events[0].message
-    const messageType = message.type
-    //handle text
-    if (messageType === 'text') {
-      bot.pushMessage(userId, message.text).then(queryResult => {
-        checkIntent(queryResult, req.body.events[0])
-        // replyTo(replyToken,{
-        //     type:'text',
-        //     text:queryResult.fulfillmentText
-        // })
-        // client.replyMessage(replyToken, {
-        //     type: 'text',
-        //     text: queryResult.fulfillmentText
-        // })
-      });
-    }
-  } else if (type === 'beacon') {
-    //push data to user
-    console.log('recive beacon')
-    replyTo(replyToken, {
-      type: 'flex',
-      altText: "This is a Flex Message",
-      contents: card
-    })
-  } else if (type === 'follow') {
-    //add user id to DB
-    console.log('someone follow us')
-    replyTo(replyToken, {
-      type: 'text',
-      text: 'ขิง ข่า ตะใคร้ ใบมะกรูด'
-    })
-  } else if (type === 'unfollow') {
-    //remove user id in DB
-    console.log('someone unfollow us')
-  }
-}
-
-
-const checkIntent = (queryResult, line) => {
-  console.log(queryResult)
-  console.log(line)
-
-  var intentName = queryResult.intent.displayName
-  var replyToken = line.replyToken
-
-  if (intentName === 'ask info - custom') {
-    var sensor = queryResult.parameters.fields.sensor.stringValue
-    //request data from DB
-    Sensor._getEntry(sensor, 1, (err, doc) => {
-      //reply
-      replyTo(replyToken, {
-        type: 'text',
-        text: '' + sensor + ' : ' + doc[0][sensor]
-      })
-    })
-  }
-  // handle normal intent
-  else {
-    console.log('reply : ', queryResult.fulfillmentText)
-    replyTo(replyToken, {
-      type: 'text',
-      text: queryResult.fulfillmentText
-    })
-  }
-}
+const getIntent = (queryResult) => queryResult.intent.displayName
 
 export default webhook
