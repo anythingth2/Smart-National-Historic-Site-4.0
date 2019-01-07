@@ -18,6 +18,8 @@ const client = new Client({
 const bot = new Bot()
 
 const handleBeacon = (req) => {
+  const event = req.body.events[0]
+  const { replyToken } = event
   //push data to user
   console.log('recive beacon')
   replyTo(replyToken, {
@@ -28,6 +30,8 @@ const handleBeacon = (req) => {
 }
 
 const handleFollow = (req) => {
+  const event = req.body.events[0]
+  const { replyToken } = event
   //add user id to DB
   console.log('someone follow us')
   replyTo(replyToken, {
