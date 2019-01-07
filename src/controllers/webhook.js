@@ -4,6 +4,7 @@ import {
 import Bot from '../bot'
 import card from '../card'
 import Sensor from './sensor'
+import User from './user'
 import webhookMessageHandler from './webhookMessageHandler'
 
 const {
@@ -32,22 +33,16 @@ const handleBeacon = (req) => {
 const handleFollow = (req) => {
   const event = req.body.events[0]
   const { replyToken } = event
-  //add user id to DB
   console.log('someone follow us')
-  replyTo(replyToken, {
-    type: 'text',
-    text: 'ขิง ข่า ตะใคร้ ใบมะกรูด'
-  })
+  //add user id to DB
+  User.addUser(event.source.userId,0)
+  
 }
 
 const handleUnfollow = (req) => {
-  //remove user id in DB
   console.log('someone unfollow us')
-}
+  //remove user id in DB
 
-const webhook = (req, res) => {
-  checkEventType(req)
-  res.status(200).end()
 }
 
 const handleMessage = (req) => {
@@ -66,11 +61,18 @@ const handleMessage = (req) => {
   }
 }
 
+// ================================ 
+
 const eventMapping = {
   message: handleMessage,
   beacon: handleBeacon,
   follow: handleFollow,
   unfollow: handleUnfollow
+}
+
+const webhook = (req, res) => {
+  checkEventType(req)
+  res.status(200).end()
 }
 
 const checkEventType = (req) => {
@@ -80,6 +82,12 @@ const checkEventType = (req) => {
   } else {
     console.error("EventType Not implemented " + type)
   }
+}
+
+export const muticast = (userIdlist,messageObj) => {
+  userIdlist.forEach(userId => {
+    sendTo(userId,messageObj)
+  });
 }
 
 export const replyTo = (replyToken, messageObj) => {
