@@ -31,6 +31,36 @@ const getUser = (userId, callback) => {
   })
 }
 
+/**
+ * 
+ * @param {User} userId 
+ * @param {Function} callback 
+ */
+
+const getAllUser = (callback) => {
+  User.find({ }, (err, users) => {
+    if (err) {
+      console.error(err)
+    }
+    callback(err, users)
+  })
+}
+
+/**
+ * 
+ * @param {User} userId 
+ * @param {Function} callback 
+ */
+
+const delUser = (userId, callback) => {
+  User.deleteOne({ userId }, (err, user) => {
+    if (err) {
+      console.error(err)
+    }
+    callback(err, user)
+  })
+}
+
 
 //Add user example
 // User.addUser('123123', 1, err => {
@@ -54,5 +84,7 @@ const getUser = (userId, callback) => {
 
 export default {
   addUser,
-  getUser
+  getUser,
+  getAllUser,
+  delUser
 }

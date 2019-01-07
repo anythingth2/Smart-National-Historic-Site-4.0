@@ -6,6 +6,7 @@ import card from '../card'
 import Sensor from './sensor'
 import User from './user'
 import webhookMessageHandler from './webhookMessageHandler'
+import async from 'async'
 
 const {
   channelAccessToken,
@@ -16,11 +17,13 @@ const client = new Client({
   channelAccessToken,
   channelSecret
 });
+
 const bot = new Bot()
 
-const handleBeacon = (req) => {
-  const event = req.body.events[0]
-  const { replyToken } = event
+const handleBeacon = (event, callback) => {
+  const {
+    replyToken
+  } = event
   //push data to user
   console.log('recive beacon')
   replyTo(replyToken, {
@@ -28,33 +31,54 @@ const handleBeacon = (req) => {
     altText: "This is a Flex Message",
     contents: card
   })
+  callback()
 }
 
-const handleFollow = (req) => {
-  const event = req.body.events[0]
-  const { replyToken } = event
+const handleFollow = (event, callback) => {
+  const {
+    replyToken
+  } = event
   console.log('someone follow us')
   //add user id to DB
-  User.addUser(event.source.userId,0)
-  
+  User.addUser(event.source.userId, 0, (err) => {
+    if (err) {
+      // Implement
+      // response with error status
+    } else {
+      callback()
+    }
+  })
 }
 
-const handleUnfollow = (req) => {
+const handleUnfollow = (event, callback) => {
+  const {
+    replyToken
+  } = event
   console.log('someone unfollow us')
   //remove user id in DB
-
+  User.delUser(event.source.userId, (err) => {
+    if (err) {
+      // Implement
+      // response with error status
+    } else {
+      callback()
+    }
+  })
 }
 
-const handleMessage = (req) => {
-  const event = req.body.events[0]
-  const { replyToken, message } = event
+const handleMessage = (event, callback) => {
+
+  const {
+    replyToken,
+    message
+  } = event
   const userId = event.source.userId
   const messageType = message.type
 
   if (messageType === 'text') {
     bot.pushMessage(userId, message.text).then(queryResult => {
       const intentName = getIntent(queryResult)
-      webhookMessageHandler(intentName, queryResult, replyToken)
+      webhookMessageHandler(intentName, queryResult, replyToken, callback)
     });
   } else {
     console.error('MessageType Not implemented ' + messageType)
@@ -76,26 +100,46 @@ const webhook = (req, res) => {
 }
 
 const checkEventType = (req) => {
-  const type = req.body.events[0].type
-  if (eventMapping[type]) {
-    eventMapping[type](req)
-  } else {
-    console.error("EventType Not implemented " + type)
-  }
+  const events = req.body.events
+  const funcs = events.map(event => {
+    return (callback) => {
+      const type = event.type
+      if (eventMapping[type]) {
+        eventMapping[type](event, callback)
+      } else {
+        console.error("EventType Not implemented " + type)
+      }
+    }
+  })
+
+  async.series(funcs, (err) => {
+    if (err) {
+      console.error(err)
+    }
+  })
+
 }
 
-export const muticast = (userIdlist,messageObj) => {
-  userIdlist.forEach(userId => {
-    sendTo(userId,messageObj)
+// User.getAllUser((err,users)=>{
+  //   console.log(users)
+  //   muticast(users,{
+  //     type:'text',
+  //     text: message.text
+  //   })
+  // })
+
+export const muticast = (users, messageObj) => {
+  users.forEach(user => {
+    sendTo(user.userId, messageObj)
   });
 }
 
 export const replyTo = (replyToken, messageObj) => {
-  client.replyMessage(replyToken, messageObj)
+  return client.replyMessage(replyToken, messageObj)
 }
 
 export const sendTo = (userId, messageObj) => {
-  client.pushMessage(userId, messageObj)
+  return client.pushMessage(userId, messageObj)
 }
 
 const getIntent = (queryResult) => queryResult.intent.displayName
