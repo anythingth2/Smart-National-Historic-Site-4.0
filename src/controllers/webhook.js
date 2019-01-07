@@ -3,8 +3,8 @@ import {
 } from '@line/bot-sdk'
 import Bot from '../bot'
 import card from '../card'
-import Sensor from './sensor'
 import webhookMessageHandler from './webhookMessageHandler'
+import async from 'async'
 
 const {
   channelAccessToken,
@@ -15,10 +15,10 @@ const client = new Client({
   channelAccessToken,
   channelSecret
 });
+
 const bot = new Bot()
 
-const handleBeacon = (req) => {
-  const event = req.body.events[0]
+const handleBeacon = (event, callback) => {
   const { replyToken } = event
   //push data to user
   console.log('recive beacon')
@@ -27,10 +27,10 @@ const handleBeacon = (req) => {
     altText: "This is a Flex Message",
     contents: card
   })
+  callback()
 }
 
-const handleFollow = (req) => {
-  const event = req.body.events[0]
+const handleFollow = (event, callback) => {
   const { replyToken } = event
   //add user id to DB
   console.log('someone follow us')
@@ -38,11 +38,13 @@ const handleFollow = (req) => {
     type: 'text',
     text: 'ขิง ข่า ตะใคร้ ใบมะกรูด'
   })
+  callback()
 }
 
-const handleUnfollow = (req) => {
+const handleUnfollow = (event, callback) => {
   //remove user id in DB
   console.log('someone unfollow us')
+  callback()
 }
 
 const webhook = (req, res) => {
@@ -50,8 +52,7 @@ const webhook = (req, res) => {
   res.status(200).end()
 }
 
-const handleMessage = (req) => {
-  const event = req.body.events[0]
+const handleMessage = (event, callback) => {
   const { replyToken, message } = event
   const userId = event.source.userId
   const messageType = message.type
@@ -59,7 +60,7 @@ const handleMessage = (req) => {
   if (messageType === 'text') {
     bot.pushMessage(userId, message.text).then(queryResult => {
       const intentName = getIntent(queryResult)
-      webhookMessageHandler(intentName, queryResult, replyToken)
+      webhookMessageHandler(intentName, queryResult, replyToken, callback)
     });
   } else {
     console.error('MessageType Not implemented ' + messageType)
@@ -74,20 +75,32 @@ const eventMapping = {
 }
 
 const checkEventType = (req) => {
-  const type = req.body.events[0].type
-  if (eventMapping[type]) {
-    eventMapping[type](req)
-  } else {
-    console.error("EventType Not implemented " + type)
-  }
+  const events = req.body.events
+  const funcs = events.map(event => {
+    return (callback) => {
+      const type = event.type
+      if (eventMapping[type]) {
+        eventMapping[type](event, callback)
+      } else {
+        console.error("EventType Not implemented " + type)
+      }
+    }
+  })
+
+  async.series(funcs, (err) => {
+    if (err) {
+      console.error(err)
+    }
+  })
+
 }
 
 export const replyTo = (replyToken, messageObj) => {
-  client.replyMessage(replyToken, messageObj)
+  return client.replyMessage(replyToken, messageObj)
 }
 
 export const sendTo = (userId, messageObj) => {
-  client.pushMessage(userId, messageObj)
+  return client.pushMessage(userId, messageObj)
 }
 
 const getIntent = (queryResult) => queryResult.intent.displayName
