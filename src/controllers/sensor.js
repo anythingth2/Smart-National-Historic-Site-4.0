@@ -56,7 +56,6 @@ const _addEntry = (req, res) => {
   })
 }
 
-
 const addEntry = (req, res) => {
   const rawData = req.body.DevEUI_uplink.payload_hex.substring(0, 62)
   const sensorData = parseData(splitData(rawData, 6))
@@ -70,6 +69,13 @@ const addEntry = (req, res) => {
     }
   })
 }
+
+/**
+ * 
+ * @param {String} select 
+ * @param {Number} limit 
+ * @param {Function} callback 
+ */
 
 const _getEntry = (select, limit, callback) => {
   let findQuery = Sensor.find({}).sort({ createdAt: -1 })
