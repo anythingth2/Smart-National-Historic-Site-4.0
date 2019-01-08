@@ -2,7 +2,7 @@ import {
   Client
 } from '@line/bot-sdk'
 import Bot from '../bot'
-import card from '../card'
+import flex from '../flex'
 import Sensor from './sensor'
 import User from './user'
 import webhookMessageHandler from './webhookMessageHandler'
@@ -24,14 +24,23 @@ const handleBeacon = (event, callback) => {
   const {
     replyToken
   } = event
+  type = event.beacon.type
   //push data to user
-  console.log('recive beacon')
-  replyTo(replyToken, {
-    type: 'flex',
-    altText: "This is a Flex Message",
-    contents: card
-  })
-  callback()
+  console.log('recive beacon : ',type)
+  if(type == 'enter'){
+    replyTo(replyToken, {
+      type: 'flex',
+      altText: "This is a Flex Message",
+      contents: flex.card
+    })
+    callback()
+  }
+  else{
+    replyTo(replyToken,{
+      type:'text',
+      text:'Bye'
+    })
+  }
 }
 
 const handleFollow = (event, callback) => {
@@ -67,7 +76,6 @@ const handleUnfollow = (event, callback) => {
 }
 
 const handleMessage = (event, callback) => {
-
   const {
     replyToken,
     message
@@ -117,7 +125,6 @@ const checkEventType = (req) => {
       console.error(err)
     }
   })
-
 }
 
 // User.getAllUser((err,users)=>{
@@ -128,7 +135,7 @@ const checkEventType = (req) => {
   //   })
   // })
 
-export const muticast = (users, messageObj) => {
+export const multicast = (users, messageObj) => {
   users.forEach(user => {
     sendTo(user.userId, messageObj)
   });

@@ -1,4 +1,4 @@
-export default {
+const card = {
   "type": "bubble",
   "hero": {
     "type": "image",
@@ -119,4 +119,8 @@ export default {
     ],
     "flex": 0
   }
+}
+
+export default {
+  card
 }
