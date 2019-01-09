@@ -5,7 +5,7 @@ const DATASET_TRAINING_SIZE = 0.7;
 const DATASET_VALIDATION_SIZE = 0.3;
 // const DATASET_TEST
 const SERIES_SIZE = 4;
-const LEARNING_RATE = 0.01;
+const LEARNING_RATE = 0.0075;
 const BATCH_SIZE = 4;
 const EPOCHS = 100;
 const SHUFFLE = true;
@@ -67,7 +67,7 @@ const createModel = () => {
         optimizer: tf.train.adam(LEARNING_RATE),
         // optimizer:tf.train.rmsprop(0.11),
         loss: 'meanSquaredError',
-        metrics: ['accuracy']
+        metrics: ['accuracy','mse']
     });
 
     return model;
