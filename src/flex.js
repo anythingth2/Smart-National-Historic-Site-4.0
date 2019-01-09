@@ -14,8 +14,7 @@ const card = {
   "body": {
     "type": "box",
     "layout": "vertical",
-    "contents": [
-      {
+    "contents": [{
         "type": "text",
         "text": "พระราชวังสนามจันทร์",
         "weight": "bold",
@@ -26,13 +25,11 @@ const card = {
         "layout": "vertical",
         "margin": "lg",
         "spacing": "sm",
-        "contents": [
-          {
+        "contents": [{
             "type": "box",
             "layout": "baseline",
             "spacing": "sm",
-            "contents": [
-              {
+            "contents": [{
                 "type": "text",
                 "text": "ประเภท",
                 "color": "#aaaaaa",
@@ -53,8 +50,7 @@ const card = {
             "type": "box",
             "layout": "baseline",
             "spacing": "sm",
-            "contents": [
-              {
+            "contents": [{
                 "type": "text",
                 "text": "ปีก่อสร้าง",
                 "color": "#aaaaaa",
@@ -75,8 +71,7 @@ const card = {
             "type": "box",
             "layout": "baseline",
             "spacing": "sm",
-            "contents": [
-              {
+            "contents": [{
                 "type": "text",
                 "text": "ผู้สร้าง",
                 "color": "#aaaaaa",
@@ -101,8 +96,7 @@ const card = {
     "type": "box",
     "layout": "vertical",
     "spacing": "sm",
-    "contents": [
-      {
+    "contents": [{
         "type": "button",
         "style": "link",
         "height": "sm",
@@ -121,6 +115,70 @@ const card = {
   }
 }
 
+function getCustomFlex(img, imgUri, text, button, buttonUri) {
+  let card = {
+    "type": "bubble",
+    "hero": {},
+    "body": {},
+    "footer": {}
+  }
+  let hero, body, footer
+  if (img && imgUri) {
+    card.hero = {
+      "type": "image",
+      "url": img,
+      "size": "full",
+      "aspectRatio": "20:13",
+      "aspectMode": "cover",
+      "action": {
+        "type": "uri",
+        "uri": imgUri
+      }
+    }
+  }else{
+    delete card.hero
+  }
+
+  if (text) {
+    card.body = {
+      "type": "box",
+      "layout": "vertical",
+      "contents": [{
+        "type": "text",
+        "text": text,
+        "weight": "bold",
+        "size": "xl"
+      }]
+    }
+  }else{
+    delete card.body
+  }
+
+  if (button && buttonUri) {
+    card.footer = {
+      "type": "box",
+      "layout": "vertical",
+      "spacing": "sm",
+      "contents": [{
+        "type": "button",
+        "style": "link",
+        "height": "sm",
+        "action": {
+          "type": "uri",
+          "label": button,
+          "uri": buttonUri
+        }
+      }],
+      "flex": 0
+    }
+  }else{
+    delete card.footer
+  }
+
+  return card
+}
+
 export default {
-  card
+  card,
+  getCustomFlex
 }
