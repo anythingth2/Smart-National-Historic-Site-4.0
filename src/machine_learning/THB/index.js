@@ -3,12 +3,12 @@ require('@tensorflow/tfjs-node')
 const csvtojson = require('csvtojson');
 const DATASET_TRAINING_SIZE = 0.7;
 const DATASET_VALIDATION_SIZE = 0.3;
-const SERIES_SIZE = 16;
-const LEARNING_RATE = 0.0075;
+const SERIES_SIZE = 6;
+const LEARNING_RATE = 0.1;
 const BATCH_SIZE = 16;
-const EPOCHS = 50;
-const SHUFFLE = true;
-const VALIDATION_SPLIT = 0;
+const EPOCHS = 5;
+const SHUFFLE = false;
+const VALIDATION_SPLIT = 0.2;
 
 const WEIGHT_PATH = 'weight';
 const readCsv = async () => {
@@ -31,6 +31,7 @@ const preprocess = async () => {
     var data = await readCsv();
     var trainingData = data.training.value;
     var validationData = data.validation.value;
+
     const decode = (baths) => {
         var xs = [];
         var ys = [];
@@ -52,7 +53,7 @@ const preprocess = async () => {
 const compile = (model) => {
     model.compile({
         optimizer: tf.train.adam(LEARNING_RATE),
-        // optimizer:tf.train.rmsprop(0.11),
+        // optimizer: tf.train.rmsprop(0.5),
         loss: 'meanSquaredError',
         metrics: ['accuracy', 'mse']
     });
@@ -64,6 +65,32 @@ const createModel = () => {
         units: SERIES_SIZE,
         inputShape: [SERIES_SIZE, 1],
     }));
+    // model.add(tf.layers.lstm({
+    //     units: SERIES_SIZE
+    // }));
+    model.add(tf.layers.dense({
+        units: 16,
+        activation: 'relu'
+    }));
+    model.add(tf.layers.dropout(0.1));
+
+    model.add(tf.layers.dense({
+        units: 8,
+        activation: 'relu'
+    }));
+    model.add(tf.layers.dropout(0.1));
+
+    model.add(tf.layers.dense({
+        units: 4,
+        activation: 'relu'
+    }));
+    model.add(tf.layers.dropout(0.1));
+
+    model.add(tf.layers.dense({
+        units: 2,
+        activation: 'relu'
+    }));
+    model.add(tf.layers.dropout(0.1));
 
     model.add(tf.layers.dense({
         units: 1,
@@ -94,24 +121,29 @@ const trainModel = async (model, xs, ys) => {
                 saveModel(model);
             }
         }
-    })
-
-
+    });
 };
+// const predictSelf = (model,size) => {
+//     const yTrainedPred = model.predict(datasets.validation.xs.slice());
 
-
+//     yTrainedPred.print();
+// }
 const main = async () => {
     var datasets = await preprocess();
-    console.log(datasets)
+
     const model = createModel();
     model.summary();
     await trainModel(model, datasets.training.xs, datasets.training.ys);
+    console.log('model predict');
+    const yPred = model.predict(datasets.validation.xs);
+    yPred.print();
+
+    console.log('save model')
     await saveModel(model);
-    const trainedModel = await loadModel();
-    const results = trainedModel.evaluate(datasets.validation.xs, datasets.validation.ys);
-    results.forEach((result) => {
-        result.print();
-    })
+    // const trainedModel = await loadModel();
+    // predictSelf(trainModel);
+    // // const yTrainedPred = trainedModel.predict(datasets.validation.xs);
+    // // yTrainedPred.print();
 };
 
 main();
