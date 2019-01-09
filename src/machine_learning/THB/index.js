@@ -6,7 +6,7 @@ const DATASET_VALIDATION_SIZE = 0.3;
 const SERIES_SIZE = 6;
 const LEARNING_RATE = 0.1;
 const BATCH_SIZE = 16;
-const EPOCHS = 5;
+const EPOCHS = 100;
 const SHUFFLE = false;
 const VALIDATION_SPLIT = 0.2;
 
@@ -123,11 +123,10 @@ const trainModel = async (model, xs, ys) => {
         }
     });
 };
-// const predictSelf = (model,size) => {
-//     const yTrainedPred = model.predict(datasets.validation.xs.slice());
+const predictMoney = (model,data) => {
+    return model.predict(tf.tensor2d(data));
+};
 
-//     yTrainedPred.print();
-// }
 const main = async () => {
     var datasets = await preprocess();
 
@@ -140,10 +139,12 @@ const main = async () => {
 
     console.log('save model')
     await saveModel(model);
-    // const trainedModel = await loadModel();
-    // predictSelf(trainModel);
-    // // const yTrainedPred = trainedModel.predict(datasets.validation.xs);
-    // // yTrainedPred.print();
+    const trainedModel = await loadModel();
+
+   
+    const yTrainedPred = trainedModel.predict(datasets.validation.xs);
+    yTrainedPred.print(); 
+    predictMoney(trainedModel,datasets.validation.slice(0,SERIES_SIZE)).print();
 };
 
 main();
