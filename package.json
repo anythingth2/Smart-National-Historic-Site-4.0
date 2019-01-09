@@ -5,16 +5,20 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node index.js",
+    "weather": "node src/machine_learning/historial-hourly-weather",
+    "bath": "node src/machine_learning/THB"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@line/bot-sdk": "^6.4.0",
+    "@tensorflow/tfjs": "^0.14.1",
     "async": "^2.6.1",
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "cors": "^2.8.5",
+    "csvtojson": "^2.0.8",
     "dialogflow": "^0.7.0",
     "dotenv": "^6.2.0",
     "express": "^4.16.4",
