@@ -57,8 +57,12 @@ const _getEntry = (select, limit, callback) => {
   findQuery.select((select || '-_id -__v')).exec(callback)
 }
 
+const _getLastSensor = (callback) => {
+  Sensor.find({}).sort({ createdAt: -1 }).limit(1).exec(callback)
+}
+
 const getLastSensor = (req, res) => {
-  Sensor.find({}).sort({ createdAt: -1 }).limit(1).exec((err, doc) => {
+  _getLastSensor((err, doc) => {
     if (err) {
       console.error(err)
       res.status(500).json({
