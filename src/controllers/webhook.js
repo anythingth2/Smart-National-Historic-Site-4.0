@@ -5,7 +5,8 @@ import Bot from '../bot'
 import lineMessage from '../lineMessage'
 import Sensor from './sensor'
 import User from './user'
-import webhookMessageHandler from './webhookMessageHandler'
+// import webhookMessageHandler from './webhookDialogflowMessageHandler'
+import webhookMessageHandler from './webhookHandler';
 import async from 'async'
 
 const {
@@ -26,8 +27,8 @@ const handleBeacon = (event, callback) => {
   } = event
   type = event.beacon.type
   //push data to user
-  console.log('recive beacon : ',type)
-  if(type == 'enter'){
+  console.log('recive beacon : ', type)
+  if (type == 'enter') {
     replyTo(replyToken, {
       type: 'flex',
       altText: "This is a Flex Message",
@@ -35,10 +36,10 @@ const handleBeacon = (event, callback) => {
     })
     callback()
   }
-  else{
-    replyTo(replyToken,{
-      type:'text',
-      text:'Bye'
+  else {
+    replyTo(replyToken, {
+      type: 'text',
+      text: 'Bye'
     })
   }
 }
@@ -84,10 +85,11 @@ const handleMessage = (event, callback) => {
   const messageType = message.type
 
   if (messageType === 'text') {
-    bot.pushMessage(userId, message.text).then(queryResult => {
-      const intentName = getIntent(queryResult)
-      webhookMessageHandler(intentName, queryResult, replyToken, callback)
-    });
+    // bot.pushMessage(userId, message.text).then(queryResult => {
+    //   const intentName = getIntent(queryResult)
+    //   webhookMessageHandler(intentName, queryResult, replyToken, callback)
+    // });
+    webhookMessageHandler(event);
   } else {
     console.error('MessageType Not implemented ' + messageType)
   }
@@ -128,12 +130,12 @@ const checkEventType = (req) => {
 }
 
 // User.getAllUser((err,users)=>{
-  //   console.log(users)
-  //   muticast(users,{
-  //     type:'text',
-  //     text: message.text
-  //   })
-  // })
+//   console.log(users)
+//   muticast(users,{
+//     type:'text',
+//     text: message.text
+//   })
+// })
 
 export const multicast = (users, messageObj) => {
   users.forEach(user => {
