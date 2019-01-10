@@ -6,7 +6,9 @@ if (process.env.DB_USER) {
     + ":" + process.env.DB_PASS
     + "@" + process.env.DB_HOST
     + "/" + process.env.DB_DATABASE, {
-      auth: { authdb: "admin" },
+      auth: {
+        authdb: 'admin'
+      },
       useNewUrlParser: true,
       poolSize: 20
     })

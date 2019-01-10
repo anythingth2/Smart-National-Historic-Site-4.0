@@ -5,6 +5,6 @@ const router = Router()
 
 router.post('/add', Sensor.addEntry)
 router.post('/addentry', Sensor._addEntry)
-router.get('/getentry', Sensor.getEntry)
+router.get('/getLastSensor', Sensor.getLastSensor)
 
 export default router

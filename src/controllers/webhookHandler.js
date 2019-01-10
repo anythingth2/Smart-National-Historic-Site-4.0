@@ -5,11 +5,15 @@ import axios from 'axios';
 
 const handleRequestSensor = (event, next) => {
     if (event.message.text == 'Admin_mon') {
-        
-        replyTo(event.replyToken, {
-            type: 'text',
-            text: 'SENSOR'
+        Sensor._getLastSensor((err, docs) => {
+            let doc = docs[0];
+            replyTo(event.replyToken, {
+                type: 'text',
+                text: `อุณหภูมิ: ${doc.temperature} \nความชื้น: ${doc.humidity}
+                `
+            })
         })
+
     } else {
         next();
     }
