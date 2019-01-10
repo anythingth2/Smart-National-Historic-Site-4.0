@@ -1,4 +1,5 @@
 import { Beacon } from '../models'
+import Line from './line'
 import moment from 'moment'
 
 const addEntry = (req, res) => {
@@ -21,6 +22,9 @@ const addEntry = (req, res) => {
           doc.pIn += 1
         } else {
           doc.pOut += 1
+        }
+        if (doc.pIn - doc.pOut > 2) {
+          Line.alertPeopleLimt()
         }
         doc.save(() => {
           res.json({

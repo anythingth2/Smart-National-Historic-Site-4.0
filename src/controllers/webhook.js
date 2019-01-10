@@ -31,25 +31,27 @@ const handleBeacon = (event, callback) => {
   //push data to user
   console.log('recive beacon : ', type)
   let obj = {
-    beacon : {
-      datetime : momentjs().format('YYYY-MM-DD HH:mm:ss'),
-      status : type
+    beacon: {
+      datetime: momentjs().format('YYYY-MM-DD HH:mm:ss'),
+      status: type
     }
   }
-  replyTo(replyToken,lineMessage.getText(JSON.stringify(obj)))
+  axios.post('http://localhost/api/beacon/addentry', obj).then(_res => {
+    
+  })
+  if (type == 'enter') {
+    replyTo(replyToken, {
+      type: 'flex',
+      altText: "This is a Flex Message",
+      contents: lineMessage.card
+    })
+    replyTo(replyToken, lineMessage.getText(JSON.stringify(obj)))
+
+  }
+  else {
+    replyTo(replyToken, lineMessage.getText('Bye'))
+  }
   callback()
-  // if (type == 'enter') {
-  //   replyTo(replyToken, {
-  //     type: 'flex',
-  //     altText: "This is a Flex Message",
-  //     contents: JSON.stringify(obj)
-  //   })
-  //   replyTo(replyToken,lineMessage.getText(JSON.stringify(obj)))
-  //   callback()
-  // }
-  // else {
-  //   replyTo(replyToken, lineMessage.getText('Bye'))
-  // }
 }
 
 const handleFollow = (event, callback) => {
