@@ -82,7 +82,7 @@ const getLog = (req, res) => {
       $gte: start,
       $lte: end
     }
-  }, (err, docs) => {
+  }).sort({ createdAt: 1 }).exec((err, docs) => {
     if (err) {
       console.error(err)
       res.status(500).end()
