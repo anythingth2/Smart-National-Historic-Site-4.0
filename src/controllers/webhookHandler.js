@@ -4,12 +4,12 @@ import lineMessage from '../lineMessage';
 import axios from 'axios';
 
 const handleRequestSensor = (event, next) => {
-    if (event.message.text == 'Admin_mon') {
+    if (event.message.text == 'Admin_Mon') {
         Sensor._getLastSensor((err, docs) => {
             let doc = docs[0];
             replyTo(event.replyToken, {
                 type: 'text',
-                text: `อุณหภูมิ: ${doc.temperature} \nความชื้น: ${doc.humidity}`
+                text: `อุณหภูมิ: ${doc.temperature} \nความชื้น: ${doc.humidity} `
             })
         });
     } else {
