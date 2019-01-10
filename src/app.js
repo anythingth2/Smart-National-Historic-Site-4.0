@@ -8,7 +8,7 @@ import http from 'http'
 import https from 'https'
 import fs from 'fs'
 
-const { channelAccessToken, channelSecret } = process.env
+const { channelAccessToken, channelSecret, PORT } = process.env
 
 const app = express()
 
@@ -42,7 +42,7 @@ if (process.env.NODE_ENV === 'prod') {
     console.log('Server listening on port ' + 443 + ' in prod mode');
   })
 } else {
-  app.listen(8080, function () {
-    console.log('Server listening on port ' + 8080 + ' in dev mode');
+  app.listen(PORT, function () {
+    console.log('Server listening on port ' + PORT + ' in dev mode');
   })
 }
