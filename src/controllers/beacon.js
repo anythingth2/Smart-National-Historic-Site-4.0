@@ -1,4 +1,4 @@
-import { Beacon } from '../models'
+import { Beacon, pCounter } from '../models'
 import Line from './line'
 import moment from 'moment'
 
@@ -23,9 +23,7 @@ const addEntry = (req, res) => {
         } else {
           doc.pOut += 1
         }
-        if (doc.pIn - doc.pOut > 2 && status === 'enter') {
-          Line.alertPeopleLimt()
-        }
+        updatePCounter(status)
         doc.save(() => {
           res.json({
             success: true
@@ -50,6 +48,58 @@ const addEntry = (req, res) => {
   })
 }
 
+const updatePCounter = (status) => {
+  pCounter.findOne({}, (err, doc) => {
+    if (err) {
+      console.error(err)
+    }
+    if (doc) {
+      if (status === 'enter') {
+        doc.pIn += 1
+      } else {
+        doc.pOut += 1
+      }
+      doc.save()
+      if (doc.pIn - doc.pOut > 2 && status === 'enter') {
+        Line.alertPeopleLimt()
+      }
+    } else {
+      pCounter.create(status === 'enter' ? { pIn: 1 } : { pOut: 1 }, (err) => {
+        if (err) {
+          console.error(err)
+        }
+      })
+    }
+  })
+}
+
+const getLog = (req, res) => {
+  let { hours } = req.query
+  const start = moment().subtract(parseInt(hours), 'hour').startOf('hour').toDate()
+  const end = moment().subtract(1, 'hour').endOf('hour').toDate()
+  Beacon.find({
+    createdAt: {
+      $gte: start,
+      $lte: end
+    }
+  }, (err, docs) => {
+    if (err) {
+      console.error(err)
+      res.status(500).end()
+    }
+    if (docs.length < hours) {
+      res.status(400).end()
+    } else {
+      let data = docs.map(d => d.pIn.toString())
+      res.json({
+        success: true,
+        number_of_tourist: data
+      })
+    }
+  })
+}
+
 export default {
-  addEntry
+  addEntry,
+  getLog
 }

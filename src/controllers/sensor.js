@@ -1,4 +1,5 @@
 import { Sensor } from '../models'
+import moment from 'moment'
 
 const hexToDec = (hex) => {
   var val = parseInt('0x' + hex, 16)
@@ -58,8 +59,30 @@ const _getEntry = (select, limit, callback) => {
 }
 
 const _getLastSensor = (callback) => {
-  Sensor.find({}).sort({ createdAt: -1 }).limit(1).exec(callback)
+  Sensor.find({}).sort({ createdAt: -1 }).limit(1).exec((err, last) => {
+    const start = moment().subtract(1, 'hour').startOf('hour').toDate()
+    const end = moment().subtract(1, 'hour').endOf('hour').toDate()
+    last = last[0]
+    Sensor.find({
+      createdAt: {
+        $gte: start,
+        $lte: end
+      }
+    }, (err, docs) => {
+      let pIn = 0
+      let pOut = 0
+      docs.forEach(d => {
+        pIn += d.pIn ? d.pIn : 0
+        pOut += d.pOut ? d.pOut : 0
+      })
+      last.pIn = pIn
+      last.pOut = pOut
+      callback(err, last)
+    })
+  })
+
 }
+
 
 const getLastSensor = (req, res) => {
   _getLastSensor((err, doc) => {

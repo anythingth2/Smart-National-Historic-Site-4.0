@@ -1,9 +1,7 @@
 import {
   Client
 } from '@line/bot-sdk'
-import Bot from '../bot'
 import lineMessage from '../lineMessage'
-import Sensor from './sensor'
 import User from './user'
 // import webhookMessageHandler from './webhookDialogflowMessageHandler'
 import webhookMessageHandler from './webhookHandler';
@@ -21,8 +19,6 @@ const client = new Client({
   channelSecret
 });
 
-const bot = new Bot()
-
 const handleBeacon = (event, callback) => {
   const {
     replyToken
@@ -36,7 +32,7 @@ const handleBeacon = (event, callback) => {
       status: type
     }
   }
-  axios.post('http://localhost:8080/api/beacon/addentry', obj).then(_res => {
+  axios.post('http://localhost:8080/api/beacon/putSanam', obj).then(_res => {
 
   })
   if (type == 'enter') {
