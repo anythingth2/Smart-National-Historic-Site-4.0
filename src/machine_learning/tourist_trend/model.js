@@ -3,9 +3,28 @@ const csvtojson = require('csvtojson');
 class Model {
 
     async readCsv() {
-        return await csvtojson({
+        const removeExtendedField = (row) => {
+            let keys = Object.keys(row);
+            let values = [row.values];
+            let date = row.day;
+            keys.forEach(key => {
+                if (key.match(/field/))
+                    values.push(row[key]);
+            });
+            values = values.map(v => Number(v));
+            return {
+                date: date,
+                values: values
+            };
+        };
+        var data = (await csvtojson({
             delimiter: ';'
-        }).fromFile(this.CSV_PATH);
+        }).fromFile(this.CSV_PATH))
+
+        return data.map(row => {
+            let newRow = removeExtendedField(row);
+            return newRow;
+        });
     }
     async preprocess() {
         console.log(await this.readCsv());
