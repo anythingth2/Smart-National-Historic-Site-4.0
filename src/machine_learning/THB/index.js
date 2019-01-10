@@ -138,7 +138,6 @@ const trainModel = async (model, xs, ys) => {
         validationSplit: VALIDATION_SPLIT,
         callbacks: {
             onEpochEnd: (epoch, log) => {
-            
                 saveModel(model);
             }
         }
