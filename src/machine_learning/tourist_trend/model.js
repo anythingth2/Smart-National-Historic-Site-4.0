@@ -2,6 +2,7 @@ const tf = require('@tensorflow/tfjs');
 require('@tensorflow/tfjs-node');
 const csvtojson = require('csvtojson');
 const fs = require('fs');
+
 const SERIES_SIZE = 12;
 const PREDICTED_SERIES_SIZE = 3;
 const LEARNING_RATE = 0.005;
@@ -61,8 +62,10 @@ class Model {
         }
     }
     async _preprocess() {
+
         let data = await this.readCsv();
         this.freqPeoples = data.reduce((acc, current) => acc.concat(current.values), []);
+        console.log(`_pre ${this.freqPeoples}`)
         // this.max = Math.max(...(this.freqPeoples));
         // this.min = Math.min(...(this.freqPeoples));
 
@@ -172,15 +175,14 @@ class Model {
             this.model = await tf.loadModel(`file://./${WEIGHT_PATH}/model.json`);
             this.compile();
         } else {
-
             this.createModel();
             await this.trainModel();
             await this.saveModel();
-
         }
         this.model.summary();
         if (isTrain)
             await this.trainModel();
+
         return this.model;
     }
     async predict(input) {
@@ -193,6 +195,15 @@ class Model {
         console.log(this.max)
         result = result.map(v => v * this.max);
         return result;
+    }
+
+    writeJson(isReverse) {
+        let data = this.freqPeoples;
+        console.log(`writeJson ${data}`)
+        if (isReverse) {
+            data = data.reverse();
+        }
+        fs.writeFileSync('./sanam.json', JSON.stringify({ data: data }), { encoding: 'utf-8', })
     }
     constructor(isTrain) {
         this.CSV_PATH = `${__dirname}/sanam.csv`;

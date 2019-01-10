@@ -37,7 +37,7 @@ const handleBeacon = (event, callback) => {
     }
   }
   axios.post('http://localhost:8080/api/beacon/addentry', obj).then(_res => {
-    
+
   })
   if (type == 'enter') {
     replyTo(replyToken, {
@@ -161,4 +161,4 @@ export const sendTo = (userId, messageObj) => {
 
 const getIntent = (queryResult) => queryResult.intent.displayName
 
-export default webhook
+export default webhook;
