@@ -3,6 +3,7 @@ require('@tensorflow/tfjs-node');
 const csvtojson = require('csvtojson');
 
 const SERIES_SIZE = 12;
+const PREDICTED_SERIES_SIZE = 3;
 const LEARNING_RATE = 0.005;
 const BATCH_SIZE = 16;
 const EPOCHS = 200;
@@ -38,28 +39,22 @@ class Model {
 
 
     async preprocess() {
-
-
-
         let data = await this.readCsv();
         this.freqPeoples = data.reduce((acc, current) => acc.concat(current.values), []);
         this.max = Math.max(...(this.freqPeoples));
         this.min = Math.min(...(this.freqPeoples));
 
-
         this.freqPeoples = this.freqPeoples.map(v => v / this.max);
-
-        console.log(this.freqPeoples.slice(0, 10));
 
         this.xs = [];
         this.ys = [];
-        for (var i = 0; i < this.freqPeoples.length - SERIES_SIZE; i++) {
+        for (var i = 0; i < this.freqPeoples.length - SERIES_SIZE - PREDICTED_SERIES_SIZE; i++) {
             this.xs.push(this.freqPeoples.slice(i, i + SERIES_SIZE));
-            this.ys.push(this.freqPeoples[i + SERIES_SIZE]);
+            this.ys.push(this.freqPeoples.slice(i + SERIES_SIZE, i + SERIES_SIZE + PREDICTED_SERIES_SIZE));
         }
 
         this.xs = tf.tensor2d(this.xs).reshape([-1, SERIES_SIZE, 1]);
-        this.ys = tf.tensor1d(this.ys);
+        this.ys = tf.tensor2d(this.ys);
     }
 
     compile() {
@@ -126,12 +121,19 @@ class Model {
         return this.model;
     }
 
-
-
+    async trainModel() {
+        await this.model.fit(this.xs, this.ys, {
+            batchSize: BATCH_SIZE,
+            epochs: EPOCHS,
+            shuffle: SHUFFLE,
+            validationSplit: VALIDATION_SPLIT
+        });
+    }
     constructor() {
         this.CSV_PATH = `${__dirname}/sanam.csv`;
-        this.preprocess().then(() => {
+        this.preprocess().then(async () => {
             this.createModel();
+            this.trainModel();
         });
     }
 }
