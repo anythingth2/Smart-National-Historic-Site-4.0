@@ -12,8 +12,8 @@ const parseData = (data) => {
   return {
     temperature: hexToDec(data.substring(4, 8)) / 10.0,
     humidity: hexToDec(data.substring(12, 14)) / 2.0,
-    pIn: hexToDec(data.substring(18, 22)),
-    pOut: hexToDec(data.substring(26, 30))
+    pIn: hexToDec(data.substring(18, 22)) / 100,
+    pOut: hexToDec(data.substring(26, 30)) / 100
   }
 }
 

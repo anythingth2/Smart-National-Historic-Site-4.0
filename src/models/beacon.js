@@ -1,8 +1,15 @@
 import mongoose, { Schema } from 'mongoose'
 
 const beaconSchema = new Schema({
-  "P-IN": Number,
-  "P-OUT": Number,
+  pIn: {
+    type: Number,
+    default: 0
+  },
+  pOut: {
+    type: Number,
+    default: 0
+  },
+  datetime: Date
 }, {
     timestamps: true
   })
