@@ -17,6 +17,9 @@ const boardCast = (req, res) => {
                 contents: lineMessage.getCustomFlex(img,url,'Arrrrrrrrrrrr','','')
               }
         }
+        else if(msg == 'alert'){
+            alertPeopleLimt()
+        }
         multicast(users, messageObj)
     })
     res.send(msg)
