@@ -17,8 +17,12 @@ const handleRequestSensor = (event, next) => {
     }
 };
 
+const handleEcho = (event,next)=>{
+    replyTo(event.replyToken,lineMessage.getText(event.message.text))
+    next()
+}
 
-const HANDLER_LIST = [handleRequestSensor];
+const HANDLER_LIST = [handleRequestSensor,handleEcho];
 
 const handler = (event) => {
     var isBreak = true;
