@@ -6,7 +6,7 @@ const SERIES_SIZE = 12;
 const PREDICTED_SERIES_SIZE = 3;
 const LEARNING_RATE = 0.005;
 const BATCH_SIZE = 16;
-const EPOCHS = 1;
+const EPOCHS = 20;
 const SHUFFLE = false;
 const VALIDATION_SPLIT = 0.2;
 
@@ -148,6 +148,7 @@ class Model {
         }));
         this.model = model;
         this.compile();
+
         return this.model;
     }
 
@@ -164,28 +165,42 @@ class Model {
         return await this.model.save(`file://./${WEIGHT_PATH}`);
     }
 
-    async loadModel() {
+    async loadModel(isTrain) {
+
+        await this._preprocess();
         if (fs.existsSync(`./${WEIGHT_PATH}/`)) {
-            return await tf.loadModel(`file://./${WEIGHT_PATH}/model.json`);
+            this.model = await tf.loadModel(`file://./${WEIGHT_PATH}/model.json`);
+            this.compile();
         } else {
-            await this._preprocess();
+
             this.createModel();
             await this.trainModel();
             await this.saveModel();
-            return this.model;
+
         }
+        this.model.summary();
+        if (isTrain)
+            await this.trainModel();
+        return this.model;
     }
     async predict(input) {
-        if (input.length < SERIES_SIZE) {
+        if (input.length != SERIES_SIZE) {
             throw Error(`Input has number size ${input.length} but SERIES_SIZE ${SERIES_SIZE} `);
         }
-        
-
+        let dataset = tf.tensor2d([input]).reshape([-1, SERIES_SIZE, 1]);
+        let result = await this.model.predict(dataset);
+        result = Array.from(result.dataSync());
+        console.log(this.max)
+        result = result.map(v => v * this.max);
+        return result;
     }
-    constructor() {
+    constructor(isTrain) {
         this.CSV_PATH = `${__dirname}/sanam.csv`;
-        // this.loadModel();
-     
+
+        this.loadModel(isTrain).then(async () => {
+            const result = await this.predict([0, 0, 0, 0, 0, 75, 65, 59, 77, 84, 229, 98,]);
+            console.log(`result: ${result}`)
+        });
 
         // this.preprocess().then(async () => {
         //     this.createModel();

@@ -1,3 +1,3 @@
 const Model = require('./model');
-new Model();
+new Model(true);
 module.exports = Model
