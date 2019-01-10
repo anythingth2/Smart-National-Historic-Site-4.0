@@ -174,11 +174,18 @@ function getCustomFlex(img, imgUri, text, button, buttonUri) {
   }else{
     delete card.footer
   }
-
   return card
+}
+
+function getText(msg){
+  return {
+    type:'text',
+    text:msg
+  }
 }
 
 export default {
   card,
-  getCustomFlex
+  getCustomFlex,
+  getText
 }

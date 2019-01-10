@@ -2,7 +2,7 @@ import {
   Client
 } from '@line/bot-sdk'
 import Bot from '../bot'
-import flex from '../flex'
+import lineMessage from '../lineMessage'
 import Sensor from './sensor'
 import User from './user'
 import webhookMessageHandler from './webhookMessageHandler'
@@ -31,7 +31,7 @@ const handleBeacon = (event, callback) => {
     replyTo(replyToken, {
       type: 'flex',
       altText: "This is a Flex Message",
-      contents: flex.card
+      contents: lineMessage.card
     })
     callback()
   }

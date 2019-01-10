@@ -1,9 +1,7 @@
 node_modules
 package-lock.json
 .env
-<<<<<<< HEAD
 ngrok.exe
 topgun-kmitl-2019-d22b0f1358d2.json
-=======
 .DS_Store
->>>>>>> 57d31d98b73216b8d594bc5058171ddf00f78c1f
+weight/
