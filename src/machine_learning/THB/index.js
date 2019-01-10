@@ -3,16 +3,25 @@ require('@tensorflow/tfjs-node')
 const csvtojson = require('csvtojson');
 const DATASET_TRAINING_SIZE = 0.7;
 const DATASET_VALIDATION_SIZE = 0.3;
-const SERIES_SIZE = 6;
-const LEARNING_RATE = 0.05;
+const SERIES_SIZE = 4;
+const LEARNING_RATE = 0.005;
 const BATCH_SIZE = 16;
-const EPOCHS = 20;
+const EPOCHS = 200;
 const SHUFFLE = false;
 const VALIDATION_SPLIT = 0.2;
 
 const WEIGHT_PATH = 'weight';
 const readCsv = async () => {
     let data = await csvtojson().fromFile(__dirname + '/THB.csv');
+    let values = data.map(v => Number(v.value));
+    console.log(values)
+    let max = Math.max(...values);
+    let min = Math.min(...values);
+    console.log(`${max} ${min}`)
+    data = data.map(v => {
+        v.value = (v.value - min) / (max - min);
+        return v;
+    });
     let trainData = data.slice(0, Math.ceil(data.length * DATASET_TRAINING_SIZE));
     let validateData = data.slice(Math.floor(data.length * DATASET_TRAINING_SIZE))
 
@@ -29,6 +38,7 @@ const readCsv = async () => {
 };
 const preprocess = async () => {
     var data = await readCsv();
+    console.log(data)
     var trainingData = data.training.value;
     var validationData = data.validation.value;
 
@@ -53,7 +63,7 @@ const preprocess = async () => {
 const compile = (model) => {
     model.compile({
         optimizer: tf.train.adam(LEARNING_RATE),
-        // optimizer: tf.train.rmsprop(0.5),
+        // optimizer: tf.train.rmsprop(0.01),
         loss: 'meanSquaredError',
         metrics: ['accuracy', 'mse']
     });
@@ -78,34 +88,34 @@ const createModel = () => {
     //     units: SERIES_SIZE
     // }));
 
-    model.add(tf.layers.dense({
-        units: 16,
-        activation: 'relu'
-    }));
-    model.add(tf.layers.dropout(0.1));
+    // model.add(tf.layers.dense({
+    //     units: 16,
+    //     activation: 'relu'
+    // }));
+    // // model.add(tf.layers.dropout(0.1));
 
-    model.add(tf.layers.dense({
-        units: 8,
-        activation: 'relu'
-    }));
-    model.add(tf.layers.dropout(0.1));
+    // model.add(tf.layers.dense({
+    //     units: 8,
+    //     activation: 'relu'
+    // }));
+    // // model.add(tf.layers.dropout(0.1));
 
-    model.add(tf.layers.dense({
-        units: 4,
-        activation: 'relu'
-    }));
-    model.add(tf.layers.dropout(0.1));
+    // model.add(tf.layers.dense({
+    //     units: 4,
+    //     activation: 'relu'
+    // }));
+    // // model.add(tf.layers.dropout(0.1));
 
-    model.add(tf.layers.dense({
-        units: 2,
-        activation: 'relu'
-    }));
-    model.add(tf.layers.dropout(0.1));
+    // model.add(tf.layers.dense({
+    //     units: 2,
+    //     activation: 'relu'
+    // }));
+    // model.add(tf.layers.dropout(0.1));
 
     model.add(tf.layers.dense({
         units: 1,
-        kernelInitializer: 'VarianceScaling',
-        activation: 'relu'
+        // kernelInitializer: 'VarianceScaling',
+        activation: 'sigmoid'
     }));
 
     compile(model);
@@ -128,6 +138,7 @@ const trainModel = async (model, xs, ys) => {
         validationSplit: VALIDATION_SPLIT,
         callbacks: {
             onEpochEnd: (epoch, log) => {
+            
                 saveModel(model);
             }
         }
@@ -139,28 +150,25 @@ const predictMoney = (model, data) => {
 
 const main = async () => {
     var datasets = await preprocess();
-
     const model = createModel();
     model.summary();
     await trainModel(model, datasets.training.xs, datasets.training.ys);
     console.log('model predict');
-    const yPred = model.predict(datasets.validation.xs);
-    yPred.print();
 
     console.log('save model')
     await saveModel(model);
-    const trainedModel = await loadModel();
+    // const trainedModel = await loadModel();
 
 
-    // const yTrainedPred = trainedModel.predict(datasets.validation.xs);
-    // yTrainedPred.print();
-    // var testset = [datasets.validation.xs[0]];
-    var testset = tf.tensor2d([[30.72, 30.715, 30.78, 30.81, 30.79, 30.73]]).reshape([-1, SERIES_SIZE, 1])
-    // console.log(testset)
-    // testset.print();
+    // // const yTrainedPred = trainedModel.predict(datasets.validation.xs);
+    // // yTrainedPred.print();
+    // // var testset = [datasets.validation.xs[0]];
+    // var testset = tf.tensor2d([[30.72, 30.715, 30.78, 30.81, 30.79, 30.73]]).reshape([-1, SERIES_SIZE, 1])
+    // // console.log(testset)
+    // // testset.print();
 
-    console.log('predicted')
-    predictMoney(trainedModel, testset).print();
+    // console.log('predicted');
+    // predictMoney(trainedModel, testset).print();
 };
 
 main();
