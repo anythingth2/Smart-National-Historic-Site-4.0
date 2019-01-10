@@ -22,6 +22,14 @@ const boardCast = (req, res) => {
     res.send(msg)
 }
 
+function alertPeopleLimt() {
+    User.getAllUser((err,users)=>{
+        let messageObj = lineMessage.getText('จำนวนคนเกิน กรุณาเชิญคนออกจากบริเวณ')
+        multicast(users, messageObj)
+    })
+}
+
 export default {
-    boardCast
+    boardCast,
+    alertPeopleLimt
 }

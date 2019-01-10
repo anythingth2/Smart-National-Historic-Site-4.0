@@ -9,11 +9,9 @@ const handleRequestSensor = (event, next) => {
             let doc = docs[0];
             replyTo(event.replyToken, {
                 type: 'text',
-                text: `อุณหภูมิ: ${doc.temperature} \nความชื้น: ${doc.humidity}
-                `
+                text: `อุณหภูมิ: ${doc.temperature} \nความชื้น: ${doc.humidity}`
             })
-        })
-
+        });
     } else {
         next();
     }

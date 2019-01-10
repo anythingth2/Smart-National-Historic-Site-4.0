@@ -36,19 +36,20 @@ const handleBeacon = (event, callback) => {
       status : type
     }
   }
-  if (type == 'enter') {
-    // replyTo(replyToken, {
-    //   type: 'flex',
-    //   altText: "This is a Flex Message",
-    //   contents: JSON.stringify(obj)
-    // })
-    replyTo(replyToken,lineMessage.getText(JSON.stringify(obj)))
-    callback()
-  }
-  else {
-    replyTo(replyToken, lineMessage.getText('Bye'))
-  }
-  
+  replyTo(replyToken,lineMessage.getText(JSON.stringify(obj)))
+  callback()
+  // if (type == 'enter') {
+  //   replyTo(replyToken, {
+  //     type: 'flex',
+  //     altText: "This is a Flex Message",
+  //     contents: JSON.stringify(obj)
+  //   })
+  //   replyTo(replyToken,lineMessage.getText(JSON.stringify(obj)))
+  //   callback()
+  // }
+  // else {
+  //   replyTo(replyToken, lineMessage.getText('Bye'))
+  // }
 }
 
 const handleFollow = (event, callback) => {
