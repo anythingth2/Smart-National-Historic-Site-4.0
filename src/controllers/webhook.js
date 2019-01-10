@@ -8,6 +8,8 @@ import User from './user'
 // import webhookMessageHandler from './webhookDialogflowMessageHandler'
 import webhookMessageHandler from './webhookHandler';
 import async from 'async'
+import axios from 'axios'
+import momentjs from 'moment'
 
 const {
   channelAccessToken,
@@ -25,23 +27,28 @@ const handleBeacon = (event, callback) => {
   const {
     replyToken
   } = event
-  type = event.beacon.type
+  let type = event.beacon.type
   //push data to user
   console.log('recive beacon : ', type)
+  let obj = {
+    beacon : {
+      datetime : momentjs().format('YYYY-MM-DD HH:mm:ss'),
+      status : type
+    }
+  }
   if (type == 'enter') {
-    replyTo(replyToken, {
-      type: 'flex',
-      altText: "This is a Flex Message",
-      contents: lineMessage.card
-    })
+    // replyTo(replyToken, {
+    //   type: 'flex',
+    //   altText: "This is a Flex Message",
+    //   contents: JSON.stringify(obj)
+    // })
+    replyTo(replyToken,lineMessage.getText(JSON.stringify(obj)))
     callback()
   }
   else {
-    replyTo(replyToken, {
-      type: 'text',
-      text: 'Bye'
-    })
+    replyTo(replyToken, lineMessage.getText('Bye'))
   }
+  
 }
 
 const handleFollow = (event, callback) => {

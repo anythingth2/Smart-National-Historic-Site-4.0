@@ -5,18 +5,26 @@ import axios from 'axios';
 
 const handleRequestSensor = (event, next) => {
     if (event.message.text == 'Admin_mon') {
-        
-        replyTo(event.replyToken, {
-            type: 'text',
-            text: 'SENSOR'
+        Sensor._getLastSensor((err, docs) => {
+            let doc = docs[0];
+            replyTo(event.replyToken, {
+                type: 'text',
+                text: `อุณหภูมิ: ${doc.temperature} \nความชื้น: ${doc.humidity}
+                `
+            })
         })
+
     } else {
         next();
     }
 };
 
+const handleEcho = (event,next)=>{
+    replyTo(event.replyToken,lineMessage.getText(event.message.text))
+    next()
+}
 
-const HANDLER_LIST = [handleRequestSensor];
+const HANDLER_LIST = [handleRequestSensor,handleEcho];
 
 const handler = (event) => {
     var isBreak = true;
