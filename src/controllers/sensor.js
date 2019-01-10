@@ -81,5 +81,6 @@ export default {
   addEntry,
   getLastSensor,
   _addEntry,
-  _getEntry
+  _getEntry,
+  _getLastSensor
 }
