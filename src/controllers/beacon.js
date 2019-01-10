@@ -1,0 +1,2 @@
+import { Beacon } from '../models'
+
