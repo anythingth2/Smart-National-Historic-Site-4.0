@@ -1,10 +1,10 @@
 import mongoose, { Schema } from 'mongoose'
 
 const sensorSchema = new Schema({
-  Temperature: Number,
-  Humidity: Number,
-  "P-IN": Number,
-  "P-OUT": Number,
+  temperature: Number,
+  humidity: Number,
+  "PIn": Number,
+  "POut": Number,
 }, {
     timestamps: true
   })
