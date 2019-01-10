@@ -36,7 +36,7 @@ const handleBeacon = (event, callback) => {
       status: type
     }
   }
-  axios.post('http://localhost/api/beacon/addentry', obj).then(_res => {
+  axios.post('http://localhost:8080/api/beacon/addentry', obj).then(_res => {
     
   })
   if (type == 'enter') {
@@ -45,8 +45,6 @@ const handleBeacon = (event, callback) => {
       altText: "This is a Flex Message",
       contents: lineMessage.card
     })
-    replyTo(replyToken, lineMessage.getText(JSON.stringify(obj)))
-
   }
   else {
     replyTo(replyToken, lineMessage.getText('Bye'))

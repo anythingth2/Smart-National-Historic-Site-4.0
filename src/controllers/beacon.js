@@ -5,8 +5,8 @@ import moment from 'moment'
 const addEntry = (req, res) => {
   let { datetime, status } = req.body.beacon
   datetime = moment(datetime, 'YYYY-MM-DD HH:mm:ss')
-  const start = datetime.clone().subtract(1, 'hour').startOf('hour').toDate()
-  const end = datetime.clone().subtract(1, 'hour').endOf('hour').toDate()
+  const start = datetime.clone().startOf('hour').toDate()
+  const end = datetime.clone().endOf('hour').toDate()
   Beacon.findOne({
     createdAt: {
       $gte: start,
@@ -23,7 +23,7 @@ const addEntry = (req, res) => {
         } else {
           doc.pOut += 1
         }
-        if (doc.pIn - doc.pOut > 2) {
+        if (doc.pIn - doc.pOut > 2 && status === 'enter') {
           Line.alertPeopleLimt()
         }
         doc.save(() => {
