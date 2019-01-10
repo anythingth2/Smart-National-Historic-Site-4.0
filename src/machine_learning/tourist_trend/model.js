@@ -63,10 +63,9 @@ class Model {
         }
     }
     async _preprocess() {
-
         let data = await this.readCsv();
         this.freqPeoples = data.reduce((acc, current) => acc.concat(current.values), []);
-        console.log(`_pre ${this.freqPeoples}`)
+        // console.log(`_pre ${this.freqPeoples}`)
         // this.max = Math.max(...(this.freqPeoples));
         // this.min = Math.min(...(this.freqPeoples));
 
