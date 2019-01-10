@@ -6,9 +6,11 @@ const SERIES_SIZE = 12;
 const PREDICTED_SERIES_SIZE = 3;
 const LEARNING_RATE = 0.005;
 const BATCH_SIZE = 16;
-const EPOCHS = 200;
+const EPOCHS = 1;
 const SHUFFLE = false;
 const VALIDATION_SPLIT = 0.2;
+
+const WEIGHT_PATH = 'tourist_trend_weight';
 
 class Model {
 
@@ -129,11 +131,22 @@ class Model {
             validationSplit: VALIDATION_SPLIT
         });
     }
+
+    async saveModel() {
+        return await this.model.save(`file://./${WEIGHT_PATH}`);
+    }
+    async loadModel() {
+        return await tf.loadModel(`file://./${WEIGHT_PATH}/model.json`);
+    }
     constructor() {
         this.CSV_PATH = `${__dirname}/sanam.csv`;
         this.preprocess().then(async () => {
             this.createModel();
-            this.trainModel();
+            await this.trainModel();
+            await this.saveModel();
+            var newmodel = await this.loadModel();
+            
+            console.log(newmodel);
         });
     }
 }
