@@ -1,7 +1,7 @@
 const tf = require('@tensorflow/tfjs');
 require('@tensorflow/tfjs-node');
 const csvtojson = require('csvtojson');
-
+const fs = require('fs');
 const SERIES_SIZE = 12;
 const PREDICTED_SERIES_SIZE = 3;
 const LEARNING_RATE = 0.005;
@@ -70,6 +70,7 @@ class Model {
     }
 
     createModel() {
+
         let model = tf.sequential();
 
         model.add(tf.layers.lstm({
@@ -136,18 +137,29 @@ class Model {
         return await this.model.save(`file://./${WEIGHT_PATH}`);
     }
     async loadModel() {
-        return await tf.loadModel(`file://./${WEIGHT_PATH}/model.json`);
-    }
-    constructor() {
-        this.CSV_PATH = `${__dirname}/sanam.csv`;
-        this.preprocess().then(async () => {
+
+        if (fs.existsSync(`./${WEIGHT_PATH}/`)) {
+            return await tf.loadModel(`file://./${WEIGHT_PATH}/model.json`);
+        } else {
+            await this.preprocess();
             this.createModel();
             await this.trainModel();
             await this.saveModel();
-            var newmodel = await this.loadModel();
-            
-            console.log(newmodel);
-        });
+            return this.model;
+        }
+    }
+
+    constructor() {
+        this.CSV_PATH = `${__dirname}/sanam.csv`;
+        this.loadModel();
+        // this.preprocess().then(async () => {
+        //     this.createModel();
+        //     await this.trainModel();
+        //     await this.saveModel();
+        //     var newmodel = await this.loadModel();
+        //     console.log(newmodel);
+        // });
+
     }
 }
 module.exports = Model;
