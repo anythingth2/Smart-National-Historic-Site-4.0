@@ -13,7 +13,6 @@ const VALIDATION_SPLIT = 0.2;
 const WEIGHT_PATH = 'tourist_trend_weight';
 
 class Model {
-
     async readCsv() {
         const removeExtendedField = (row) => {
             let keys = Object.keys(row);
@@ -38,25 +37,53 @@ class Model {
             return newRow;
         });
     }
+    preprocess(data) {
+        // let data = await this.readCsv();
+        // this.freqPeoples = data.reduce((acc, current) => acc.concat(current.values), []);
+        let max = Math.max(...(data));
+        let min = Math.min(...(data));
 
+        data = data.map(v => v / max);
+        let xs = [];
+        let ys = [];
+        for (var i = 0; i < data.length - SERIES_SIZE - PREDICTED_SERIES_SIZE + 1; i++) {
+            xs.push(data.slice(i, i + SERIES_SIZE));
+            ys.push(data.slice(i + SERIES_SIZE, i + SERIES_SIZE + PREDICTED_SERIES_SIZE));
+        }
+        xs = tf.tensor2d(xs).reshape([-1, SERIES_SIZE, 1]);
+        ys = tf.tensor2d(ys);
 
-    async preprocess() {
+        return {
+            xs: xs,
+            ys: ys,
+            max: max,
+            min: min
+        }
+    }
+    async _preprocess() {
         let data = await this.readCsv();
         this.freqPeoples = data.reduce((acc, current) => acc.concat(current.values), []);
-        this.max = Math.max(...(this.freqPeoples));
-        this.min = Math.min(...(this.freqPeoples));
+        // this.max = Math.max(...(this.freqPeoples));
+        // this.min = Math.min(...(this.freqPeoples));
 
-        this.freqPeoples = this.freqPeoples.map(v => v / this.max);
+        // this.freqPeoples = this.freqPeoples.map(v => v / this.max);
 
-        this.xs = [];
-        this.ys = [];
-        for (var i = 0; i < this.freqPeoples.length - SERIES_SIZE - PREDICTED_SERIES_SIZE; i++) {
-            this.xs.push(this.freqPeoples.slice(i, i + SERIES_SIZE));
-            this.ys.push(this.freqPeoples.slice(i + SERIES_SIZE, i + SERIES_SIZE + PREDICTED_SERIES_SIZE));
-        }
+        // this.xs = [];
+        // this.ys = [];
+        // for (var i = 0; i < this.freqPeoples.length - SERIES_SIZE - PREDICTED_SERIES_SIZE; i++) {
+        //     this.xs.push(this.freqPeoples.slice(i, i + SERIES_SIZE));
+        //     this.ys.push(this.freqPeoples.slice(i + SERIES_SIZE, i + SERIES_SIZE + PREDICTED_SERIES_SIZE));
+        // }
 
-        this.xs = tf.tensor2d(this.xs).reshape([-1, SERIES_SIZE, 1]);
-        this.ys = tf.tensor2d(this.ys);
+        // this.xs = tf.tensor2d(this.xs).reshape([-1, SERIES_SIZE, 1]);
+        // this.ys = tf.tensor2d(this.ys);
+        let tmp = this.preprocess(this.freqPeoples);
+        this.xs = tmp.xs;
+        this.ys = tmp.ys;
+        this.max = tmp.max;
+        this.min = tmp.min;
+
+
     }
 
     compile() {
@@ -136,22 +163,30 @@ class Model {
     async saveModel() {
         return await this.model.save(`file://./${WEIGHT_PATH}`);
     }
-    async loadModel() {
 
+    async loadModel() {
         if (fs.existsSync(`./${WEIGHT_PATH}/`)) {
             return await tf.loadModel(`file://./${WEIGHT_PATH}/model.json`);
         } else {
-            await this.preprocess();
+            await this._preprocess();
             this.createModel();
             await this.trainModel();
             await this.saveModel();
             return this.model;
         }
     }
+    async predict(input) {
+        if (input.length < SERIES_SIZE) {
+            throw Error(`Input has number size ${input.length} but SERIES_SIZE ${SERIES_SIZE} `);
+        }
+        
 
+    }
     constructor() {
         this.CSV_PATH = `${__dirname}/sanam.csv`;
-        this.loadModel();
+        // this.loadModel();
+     
+
         // this.preprocess().then(async () => {
         //     this.createModel();
         //     await this.trainModel();
