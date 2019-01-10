@@ -3,6 +3,6 @@ import Beacon from '../controllers/beacon'
 
 const router = Router()
 
-// router.post('/webhook', Beacon.)
+router.post('/addEntry', Beacon.addEntry)
 
 export default router
