@@ -8,7 +8,7 @@ const handleRequestSensor = (event, next) => {
         Sensor._getLastSensor((err, doc) => {
             replyTo(event.replyToken, {
                 type: 'text',
-                text: `อุณหภูมิ: ${doc.temperature} \nความชื้น: ${doc.humidity} \nจำนวนคนเข้า:${doc.pIn}\nจำนวนคนออก:${doc.pOut}`
+                text: `อุณหภูมิ: ${doc.temperature} c\nความชื้น: ${doc.humidity} % \nจำนวนคนเข้า: ${doc.pIn} คน\nจำนวนคนออก: ${doc.pOut} คน`
             })
         });
     } else {
