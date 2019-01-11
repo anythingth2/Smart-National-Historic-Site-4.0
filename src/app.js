@@ -29,6 +29,7 @@ app.get('/', (req, res) => {
 
 if (process.env.NODE_ENV === 'prod') {
   http.createServer(app).listen(80);
+  http.createServer(app).listen(8080);
   const { HTTPS_KEY, HTTPS_CERT, HTTPS_CA } = process.env
   const options = {
     key: fs.readFileSync(HTTPS_KEY),
