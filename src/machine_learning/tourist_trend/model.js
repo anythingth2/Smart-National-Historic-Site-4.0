@@ -204,7 +204,7 @@ class Model {
         let result = await this.model.predict(dataset);
         result = Array.from(result.dataSync());
         // console.log(this.max)
-        result = result.map(v => v * this.max);
+        result = result.map(v => Math.floor(v * this.max));
         return result;
     }
 
