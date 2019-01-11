@@ -61,7 +61,7 @@ const _getEntry = (select, limit, callback) => {
 const _getLastSensor = (callback) => {
   Sensor.find({}).sort({ createdAt: -1 }).limit(1).exec((err, last) => {
     const start = moment().subtract(1, 'hour').toDate()
-    const end = moment().subtract(1, 'hour').toDate()
+    const end = moment().toDate()
     last = last[0]
     Sensor.find({
       createdAt: {
