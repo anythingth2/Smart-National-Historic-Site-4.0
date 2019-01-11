@@ -2,6 +2,40 @@ import { Beacon, pCounter } from '../models'
 import Line from './line'
 import moment from 'moment'
 
+const runEveryStartHour = () => {
+  setInterval(() => {
+    const m = moment()
+    if (m.minute() === 0 && m.second() === 0) {
+      setTimeout(() => {
+        const start = moment().startOf('hour').toDate()
+        const end = moment().endOf('hour').toDate()
+        Beacon.findOne({
+          createdAt: {
+            $gte: start,
+            $lte: end
+          }
+        }, (err, doc) => {
+          if (!doc) {
+            const newData = { pIn: 0, pOut: 0, datetime: start }
+            Beacon.create(newData, (err) => {
+              if (err) {
+                console.error(err)
+                res.status(500).json({
+                  success: false
+                })
+              } else {
+                console.log("Created new row")
+              }
+            })
+          }
+        })
+      }, 100)
+    }
+  }, 100)
+}
+
+runEveryStartHour()
+
 const addEntry = (req, res) => {
   let { datetime, status } = req.body.beacon
   datetime = moment(datetime, 'YYYY-MM-DD HH:mm:ss')
@@ -23,6 +57,7 @@ const addEntry = (req, res) => {
         } else {
           doc.pOut += 1
         }
+        doc.datetime = datetime.toDate()
         updatePCounter(status)
         doc.save(() => {
           res.json({
