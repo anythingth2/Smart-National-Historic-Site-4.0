@@ -2,6 +2,8 @@ import { Beacon, pCounter } from '../models'
 import Line from './line'
 import moment from 'moment'
 
+
+
 const runEveryStartHour = () => {
   setInterval(() => {
     const m = moment()
@@ -82,6 +84,27 @@ const addEntry = (req, res) => {
     }
   })
 }
+
+const clearPCounter = () => {
+  pCounter.findOne({}, (err, doc) => {
+    if (err) {
+      console.error(err)
+    }
+    if (doc) {
+      doc.pIn = 0
+      doc.pOut = 0
+      doc.save()
+    } else {
+      pCounter.create({ pIn: 0, pOut: 0 }, (err) => {
+        if (err) {
+          console.error(err)
+        }
+      })
+    }
+  })
+}
+
+clearPCounter()
 
 const updatePCounter = (status) => {
   pCounter.findOne({}, (err, doc) => {
