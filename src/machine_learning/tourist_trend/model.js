@@ -2,6 +2,7 @@ const tf = require('@tensorflow/tfjs');
 require('@tensorflow/tfjs-node');
 const csvtojson = require('csvtojson');
 const fs = require('fs');
+const axois = require('axios');
 
 const SERIES_SIZE = 12;
 const PREDICTED_SERIES_SIZE = 3;
@@ -38,6 +39,16 @@ class Model {
             return newRow;
         });
     }
+
+    readCsvFromAPI() {
+        const LENGTH = 8000;
+        return axois.get(`http://localhost:8080/api/beacon/getSanam?hours=${LENGTH}`).then(async _res => {
+            let numberTourist = _res.data.number_of_tourist;
+            numberTourist = numberTourist.map(v => Number(v));
+            return numberTourist;
+        });
+    }
+
     preprocess(data) {
         // let data = await this.readCsv();
         // this.freqPeoples = data.reduce((acc, current) => acc.concat(current.values), []);
@@ -62,8 +73,9 @@ class Model {
         }
     }
     async _preprocess() {
-        let data = await this.readCsv();
-        this.freqPeoples = data.reduce((acc, current) => acc.concat(current.values), []);
+        // let data = await this.readCsv();
+        // this.freqPeoples = data.reduce((acc, current) => acc.concat(current.values), []);
+        this.freqPeoples = await this.readCsvFromAPI();
         // console.log(`_pre ${this.freqPeoples}`)
         // this.max = Math.max(...(this.freqPeoples));
         // this.min = Math.min(...(this.freqPeoples));
