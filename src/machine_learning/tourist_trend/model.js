@@ -5,16 +5,15 @@ const fs = require('fs');
 
 const SERIES_SIZE = 12;
 const PREDICTED_SERIES_SIZE = 3;
-const LEARNING_RATE = 0.005;
+const LEARNING_RATE = 0.0025;
 const BATCH_SIZE = 16;
-const EPOCHS = 10;
+const EPOCHS = 50;
 const SHUFFLE = false;
 const VALIDATION_SPLIT = 0.2;
 
 const WEIGHT_PATH = 'tourist_trend_weight';
 
 class Model {
-
     async readCsv() {
         const removeExtendedField = (row) => {
             let keys = Object.keys(row);
@@ -104,14 +103,14 @@ class Model {
         let model = tf.sequential();
 
         model.add(tf.layers.lstm({
-            units: SERIES_SIZE,
+            units: Math.pow(SERIES_SIZE, 2),
             inputShape: [SERIES_SIZE, 1],
             returnSequences: true
         }));
 
-        model.add(tf.layers.gru({
-            units: SERIES_SIZE
-        }));
+        // model.add(tf.layers.gru({
+        //     units: SERIES_SIZE
+        // }));
 
         // model.add(tf.layers.lstm({
         //     units: SERIES_SIZE
@@ -192,7 +191,7 @@ class Model {
         let dataset = tf.tensor2d([input]).reshape([-1, SERIES_SIZE, 1]);
         let result = await this.model.predict(dataset);
         result = Array.from(result.dataSync());
-        console.log(this.max)
+        // console.log(this.max)
         result = result.map(v => v * this.max);
         return result;
     }
@@ -209,8 +208,8 @@ class Model {
         this.CSV_PATH = `${__dirname}/sanam.csv`;
         this.SERIES_SIZE = SERIES_SIZE;
         this.loadModel(isTrain).then(async () => {
-            const result = await this.predict([0, 0, 0, 0, 0, 75, 65, 59, 77, 84, 229, 98,]);
-            console.log(`result: ${result}`)
+            // const result = await this.predict([0, 0, 0, 0, 0, 75, 65, 59, 77, 84, 229, 98,]);
+            // console.log(`result: ${result}`)
         });
 
         // this.preprocess().then(async () => {
