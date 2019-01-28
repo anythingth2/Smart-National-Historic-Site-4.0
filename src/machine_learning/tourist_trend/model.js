@@ -73,24 +73,8 @@ class Model {
         }
     }
     async _preprocess() {
-        // let data = await this.readCsv();
-        // this.freqPeoples = data.reduce((acc, current) => acc.concat(current.values), []);
         this.freqPeoples = await this.readCsvFromAPI();
-        // console.log(`_pre ${this.freqPeoples}`)
-        // this.max = Math.max(...(this.freqPeoples));
-        // this.min = Math.min(...(this.freqPeoples));
-
-        // this.freqPeoples = this.freqPeoples.map(v => v / this.max);
-
-        // this.xs = [];
-        // this.ys = [];
-        // for (var i = 0; i < this.freqPeoples.length - SERIES_SIZE - PREDICTED_SERIES_SIZE; i++) {
-        //     this.xs.push(this.freqPeoples.slice(i, i + SERIES_SIZE));
-        //     this.ys.push(this.freqPeoples.slice(i + SERIES_SIZE, i + SERIES_SIZE + PREDICTED_SERIES_SIZE));
-        // }
-
-        // this.xs = tf.tensor2d(this.xs).reshape([-1, SERIES_SIZE, 1]);
-        // this.ys = tf.tensor2d(this.ys);
+     
         let tmp = this.preprocess(this.freqPeoples);
         this.xs = tmp.xs;
         this.ys = tmp.ys;
@@ -120,40 +104,6 @@ class Model {
             returnSequences: true
         }));
 
-        // model.add(tf.layers.gru({
-        //     units: SERIES_SIZE
-        // }));
-
-        // model.add(tf.layers.lstm({
-        //     units: SERIES_SIZE
-        // }));
-        // model.add(tf.layers.lstm({
-        //     units: SERIES_SIZE
-        // }));
-
-        // model.add(tf.layers.dense({
-        //     units: 16,
-        //     activation: 'relu'
-        // }));
-        // // model.add(tf.layers.dropout(0.1));
-
-        // model.add(tf.layers.dense({
-        //     units: 8,
-        //     activation: 'relu'
-        // }));
-        // // model.add(tf.layers.dropout(0.1));
-
-        // model.add(tf.layers.dense({
-        //     units: 4,
-        //     activation: 'relu'
-        // }));
-        // // model.add(tf.layers.dropout(0.1));
-
-        // model.add(tf.layers.dense({
-        //     units: 2,
-        //     activation: 'relu'
-        // }));
-        // model.add(tf.layers.dropout(0.1));
 
         model.add(tf.layers.dense({
             units: 3,
@@ -220,17 +170,9 @@ class Model {
         this.CSV_PATH = `${__dirname}/sanam.csv`;
         this.SERIES_SIZE = SERIES_SIZE;
         this.loadModel(isTrain).then(async () => {
-            // const result = await this.predict([0, 0, 0, 0, 0, 75, 65, 59, 77, 84, 229, 98,]);
-            // console.log(`result: ${result}`)
-        });
+       });
 
-        // this.preprocess().then(async () => {
-        //     this.createModel();
-        //     await this.trainModel();
-        //     await this.saveModel();
-        //     var newmodel = await this.loadModel();
-        //     console.log(newmodel);
-        // });
+   
 
     }
 }
