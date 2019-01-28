@@ -11,3 +11,8 @@ Fetch sensor infomations (e.g. Humidity, Temperature)  from LoRa (A wireless com
 #### Tourist trend regression
 Using LSTM in TensorflowJS for regression.
 
+#### Tourist Counter 
+Count number of tourist by LINE Beacon and distance sensor on STM32.
+
+#### Basic Chat Bot
+Chat bot for asking some infomation from admin account. Using DialogFlow.
